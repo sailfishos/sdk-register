@@ -46,13 +46,13 @@ void SsuRegClient::run()
 
   for (int i=0; i < arguments.size(); ++i) {
     if (arguments.at(i) == "-u") {
-      if (i + 1 < arguments.size()) {
-        username = arguments.at(i+1);
+      if ((++i) < arguments.size()) {
+        username = arguments.at(i);
       }
     }
     else if (arguments.at(i) == "-p") {
-      if (i + 1 < arguments.size()) {
-        password = arguments.at(i+1);
+      if ((++i)  < arguments.size()) {
+        password = arguments.at(i);
       }
     }
   }
