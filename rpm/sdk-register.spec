@@ -2,8 +2,8 @@ Name: sdk-register
 Version: 0.1
 Release: 1
 Summary: SDK SSU register utility
-Group: System/Base
-License: GPL
+Group: Development/Tools
+License: GPL v2
 Source0: %{name}-%{version}.tar.gz
 BuildRequires: pkgconfig(Qt5Core)
 BuildRequires: ssu-devel
