@@ -6,8 +6,6 @@
  */
 
 #include <QCoreApplication>
-#include <QDebug>
-
 #include "ssuregclient.h"
 
 SsuRegClient::SsuRegClient(): QObject(),
@@ -23,7 +21,7 @@ void SsuRegClient::handleResponse()
   QTextStream qout(stdout);
 
   if (ssu.error()) {
-    qout << "Last operation failed: \n" << ssu.lastError() << endl;
+    qout << "Last operation failed: " << ssu.lastError() << endl;
     QCoreApplication::exit(1);
   } else {
     qout << "Operation successful" << endl;
@@ -43,29 +41,43 @@ void SsuRegClient::run()
 {
   QTextStream qout(stdout);
 
+  QString username, password;
   QStringList arguments = QCoreApplication::arguments();
 
-  // make sure there's a first argument to parse
-  if (arguments.count() < 3) {
+  for (int i=0; i < arguments.size(); ++i) {
+    if (arguments.at(i) == "-u") {
+      if (i + 1 < arguments.size()) {
+        username = arguments.at(i+1);
+      }
+    }
+    else if (arguments.at(i) == "-p") {
+      if (i + 1 < arguments.size()) {
+        password = arguments.at(i+1);
+      }
+    }
+  }
+
+  if (username.isEmpty() || password.isEmpty()) {
     usage();
     return;
   }
 
+  optRegister(username, password);
 
   // functions that need to wait for a response from ssu should set a flag so
   // we can do default exit catchall here
-
-  if (state == Idle)
+  if (state == Idle) {
     QCoreApplication::exit(0);
-
-  else if (state == UserError)
+  }
+  else if (state == UserError) {
     usage();
+  }
 }
 
 void SsuRegClient::usage()
 {
   QTextStream qout(stderr);
-  qout << "\nUsage: kala <command> [-command-options] [arguments]" << endl;
+  qout << "\nUsage: sdk-register -u username -p password" << endl;
   qout.flush();
   QCoreApplication::exit(1);
 }

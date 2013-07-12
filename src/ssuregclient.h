@@ -11,7 +11,6 @@
 #include <QObject>
 #include <QSettings>
 #include <QStringList>
-#include <QDebug>
 
 #include <ssu.h>
 
