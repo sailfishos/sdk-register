@@ -6,6 +6,7 @@ Group: Development/Tools
 License: GPL v2
 Source0: %{name}-%{version}.tar.gz
 BuildRequires: pkgconfig(Qt5Core)
+BuildRequires: pkgconfig(Qt5Xml)
 BuildRequires: ssu-devel
 BuildRequires: qt5-qmake
 
