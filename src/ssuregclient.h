@@ -24,16 +24,25 @@ public slots:
   void run();
 
 private:
-  Ssu ssu;
-  int state;
-  void usage();
-  void optRegister(const QString& username, const QString& password);
-
   enum State {
     Idle,
     Busy,
     UserError
   };
+
+  enum Option {
+    OP_Register,
+    OP_Status,
+    OP_Domain
+  };
+
+
+  Ssu _ssu;
+  int _state;
+  Option _option;
+  void usage();
+  void optRegister(const QString& username, const QString& password);
+  QString printOption(Option);
 
 private slots:
   void handleResponse();

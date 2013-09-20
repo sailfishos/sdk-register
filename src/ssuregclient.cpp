@@ -9,32 +9,45 @@
 #include "ssuregclient.h"
 
 SsuRegClient::SsuRegClient(): QObject(),
-                              state(Idle)
+                              _state(Idle),
+                              _option(OP_Register)
 {
   connect(this, SIGNAL(done()), QCoreApplication::instance(),
           SLOT(quit()), Qt::DirectConnection);
-  connect(&ssu, SIGNAL(done()), this, SLOT(handleResponse()));
+  connect(&_ssu, SIGNAL(done()), this, SLOT(handleResponse()));
+}
+
+QString SsuRegClient::printOption(Option op)
+{
+  switch (op) {
+  case OP_Register:
+    return "Register";
+    break;
+  default:
+    return "Unknown";
+    break;
+  }
 }
 
 void SsuRegClient::handleResponse()
 {
   QTextStream qout(stdout);
 
-  if (ssu.error()) {
-    qout << "Last operation failed: " << ssu.lastError() << endl;
+  if (_ssu.error()) {
+    qout << printOption(_option) << " failed: " << _ssu.lastError() << endl;
     QCoreApplication::exit(1);
   } else {
-    qout << "Operation successful" << endl;
+    qout << printOption(_option) << " successful" << endl;
     QCoreApplication::exit(0);
   }
 }
 
 void SsuRegClient::optRegister(const QString& username, const QString& password)
 {
-  ssu.sendRegistration(username, password);
+  _ssu.sendRegistration(username, password);
 
   // set state to wait for the response
-  state = Busy;
+  _state = Busy;
 }
 
 void SsuRegClient::run()
@@ -55,21 +68,45 @@ void SsuRegClient::run()
         password = arguments.at(i);
       }
     }
+    else if (arguments.at(i) == "-s") {
+      _option = OP_Status;
+    }
+    else if (arguments.at(i) == "-d") {
+      _option = OP_Domain;
+    }
   }
 
-  if (username.isEmpty() || password.isEmpty()) {
+  switch (_option) {
+  case OP_Register:
+    if (username.isEmpty() || password.isEmpty()) {
+      usage();
+      return;
+    }
+    optRegister(username, password);
+    break;
+
+  case OP_Status:
+    if (_ssu.isRegistered())
+      qout << "registered" << endl;
+    else
+      qout << "not-registered" << endl;
+    break;
+
+  case OP_Domain:
+    qout << _ssu.domain() << endl;
+    break;
+
+  default:
     usage();
     return;
   }
 
-  optRegister(username, password);
-
   // functions that need to wait for a response from ssu should set a flag so
   // we can do default exit catchall here
-  if (state == Idle) {
+  if (_state == Idle) {
     QCoreApplication::exit(0);
   }
-  else if (state == UserError) {
+  else if (_state == UserError) {
     usage();
   }
 }
@@ -77,7 +114,10 @@ void SsuRegClient::run()
 void SsuRegClient::usage()
 {
   QTextStream qout(stderr);
-  qout << "\nUsage: sdk-register -u username -p password" << endl;
+  qout << "Usage: sdk-register [-u <username> -p <password>] [-s] [-d]" << endl
+       << "       -u <uname> -p <password>   register this device" << endl
+       << "       -s                         print out ssu registration status" << endl
+       << "       -d                         print out ssu domain" << endl;
   qout.flush();
   QCoreApplication::exit(1);
 }
