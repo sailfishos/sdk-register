@@ -9,7 +9,7 @@ SOURCES += src/main.cpp src/ssuregclient.cpp
 LIBS += -lssu
 
 reg.files = sdk-register
-reg.path = /usr/bin
+reg.path = /usr/libexec/sdk-setup
 
 INSTALLS +=  reg
 

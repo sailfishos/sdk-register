@@ -16,7 +16,7 @@ Requires: ssu
 
 %files
 %defattr(-,root,root,-)
-%{_bindir}/sdk-register
+%{_libexecdir}/sdk-setup/sdk-register
 
 %prep
 %setup -q -n %{name}-%{version}
